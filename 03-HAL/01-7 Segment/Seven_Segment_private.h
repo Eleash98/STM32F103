@@ -1,0 +1,14 @@
+//AUTHOR	:Mohamed Gamal
+//VERSION	:V02
+//DATE		:14-August-2020
+
+#ifndef SEVEN_SEGMENT_PRIVATE_H
+#define SEVEN_SEGMENT_PRIVATE_H
+
+#define COM_ANODE		0
+#define COM_CATHODE		1
+
+u8 Seven_Segment_Digits[10] ={0b0111111,0b0000110,0b1011011,0b1001111,
+								0b1100110,0b1101101,0b1111101,0b0000111,
+								0b1111111,0b1101111};
+#endif
