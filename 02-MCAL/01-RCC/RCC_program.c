@@ -70,39 +70,50 @@ void RCC_voidClockInit(void){
 	RCC->CFGR &= ~(0b1111<<18);
 	RCC->CFGR |= 4<<18;
 }
-void RCC_voidEnableClock(u8 Copy_u8BusId, u8 Copy_u8PerId){
+void RCC_voidEnableClock(u8 Copy_u8PerId){
 
-    if (Copy_u8PerId >31){
-        //return error
+    if (Copy_u8PerId >= 0 && Copy_u8PerId <= 31)
+	{
+        SET_BIT(RCC->AHBENR  , Copy_u8PerId);
     }
-    switch (Copy_u8BusId){
-        case RCC_AHB    :   SET_BIT(RCC->AHBENR  , Copy_u8PerId); break;
-        case RCC_APB1   :   SET_BIT(RCC->APB1ENR , Copy_u8PerId); break;
-        case RCC_APB2   :   SET_BIT(RCC->APB2ENR , Copy_u8PerId); break;
-        default         :/*return error*/   break;
-    }
+	else if(Copy_u8PerId >= 32 && Copy_u8PerId <= 63)
+	{
+		SET_BIT(RCC->APB2ENR , Copy_u8PerId-32);
+	}
+	else if (Copy_u8PerId >= 64 && Copy_u8PerId <= 95)
+	{
+		SET_BIT(RCC->APB1ENR , Copy_u8PerId-64);
+	}
 }
 
-void RCC_voidDisableClock(u8 Copy_u8BusId, u8 Copy_u8PerId){
+void RCC_voidDisableClock(u8 Copy_u8PerId){
 
-    if (Copy_u8PerId >31){
-        return;
+    if (Copy_u8PerId >= 0 && Copy_u8PerId <= 31)
+	{
+        CLR_BIT(RCC->AHBENR  , Copy_u8PerId);
     }
-    switch (Copy_u8BusId){
-        case RCC_AHB    :   CLR_BIT(RCC->AHBENR  , Copy_u8PerId); break;
-        case RCC_APB1   :   CLR_BIT(RCC->APB1ENR , Copy_u8PerId); break;
-        case RCC_APB2   :   CLR_BIT(RCC->APB2ENR , Copy_u8PerId); break;
-        default         :/*return error*/   break;
-    }
+	else if(Copy_u8PerId >= 32 && Copy_u8PerId <= 63)
+	{
+		CLR_BIT(RCC->APB2ENR , Copy_u8PerId-32);
+	}
+	else if (Copy_u8PerId >= 64 && Copy_u8PerId <= 95)
+	{
+		CLR_BIT(RCC->APB1ENR , Copy_u8PerId-64);
+	}
 }
 
-void RCC_voidResetClock(u8 Copy_u8BusId, u8 Copy_u8PerId)
+void RCC_voidResetClock(u8 Copy_u8PerId)
 {
-	if (Copy_u8PerId >31)
-		return;
-	switch (Copy_u8BusId){
-	        case RCC_APB1   :   RCC->APB1RSTR = 1<<Copy_u8PerId; break;
-	        case RCC_APB2   :   RCC->APB2RSTR = 1<<Copy_u8PerId; break;
-	        default         :/*return error*/   break;
-	    }
+	if (Copy_u8PerId >= 0 && Copy_u8PerId <= 31)
+	{
+  
+    }
+	else if(Copy_u8PerId >= 32 && Copy_u8PerId <= 63)
+	{
+		RCC->APB2RSTR	= 1<<(Copy_u8PerId-32);
+	}
+	else if (Copy_u8PerId >= 64 && Copy_u8PerId <= 95)
+	{
+		RCC->APB1RSTR	= 1<<(Copy_u8PerId-32);
+	}
 }
