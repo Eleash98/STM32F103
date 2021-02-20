@@ -69,7 +69,7 @@ void DIO_voidSetPin(u8 Copy_u8Port, u8 Copy_u8Pin);
 
 void DIO_voidClearPin(u8 Copy_u8Port, u8 Copy_u8Pin);
 
-u8 DIO_voidGetPinValue(u8 Copy_u8Port, u8 Copy_u8Pin);
+u8 DIO_u8GetPinValue(u8 Copy_u8Port, u8 Copy_u8Pin);
 
 void DIO_voidSetPortDirection(u8 Copy_u8Port, u8 Copy_u8Mode);
 

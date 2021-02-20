@@ -87,7 +87,7 @@ void DIO_voidClearPin(u8 Copy_u8Port, u8 Copy_u8Pin){
 }
 
 
-u8 DIO_voidGetPinValue(u8 Copy_u8Port, u8 Copy_u8Pin){
+u8 DIO_u8GetPinValue(u8 Copy_u8Port, u8 Copy_u8Pin){
 	u8 LOC_u8Result = 0;
 	switch (Copy_u8Port){
 		case PORTA:
@@ -142,18 +142,26 @@ void DIO_voidSetPortValue(u8 Copy_u8Port, u8 Copy_u8Value){
 }
 
 void DIO_voidLockPin(u8 Copy_u8Port, u8 Copy_u8Pin){
+	volatile u32* Port_LCKR;
 	switch (Copy_u8Port){
 		case PORTA:
-			DIO_PORTA->LCKR	= (1 << Copy_u8Pin);
+			Port_LCKR = &(DIO_PORTA->LCKR);
 			break;
 		case PORTB:
-			DIO_PORTB->LCKR	= (1 << Copy_u8Pin);
+			Port_LCKR = &(DIO_PORTB->LCKR);
 			break;
 		case PORTC:
-			DIO_PORTC->LCKR	= (1 << Copy_u8Pin);
+			Port_LCKR = &(DIO_PORTC->LCKR);
 			break;
 		default: break;
 	}
+	SET_BIT(*Port_LCKR,Copy_u8Pin);
+	
+	SET_BIT(*Port_LCKR,16);
+	CLR_BIT(*Port_LCKR,16);
+	SET_BIT(*Port_LCKR,16);
+	GET_BIT(*Port_LCKR,16);
+	GET_BIT(*Port_LCKR,16);
 }
 void DIO_voidSetPullResistor(u8 Copy_u8Port, u8 Copy_u8Pin, u8 Copy_u8Mode){
 	switch (Copy_u8Port){

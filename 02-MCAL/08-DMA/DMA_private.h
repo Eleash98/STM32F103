@@ -28,21 +28,5 @@ void (*DMA_voidHandlers[21])(void) = {0};
 
 #define DMA		((volatile DMA_t*)0x40020000)
 
-
-#define DMA_ENABLED						1
-#define DMA_DISABLED					0
-
-#define DMA_LOW							0
-#define DMA_MEDIUM						1
-#define DMA_HIGH						2
-#define DMA_VERY_HIGH					3
-
-#define DMA_8_BITS						0
-#define DMA_16_BITS						1
-#define DMA_32_BITS						2
-
-#define DMA_READ_FROM_PERIPHERAL		0
-#define DMA_READ_FROM_MEMORY			1
-
 #endif
 
