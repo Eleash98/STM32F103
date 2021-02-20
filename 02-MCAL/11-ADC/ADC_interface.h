@@ -63,6 +63,13 @@
 #define ADC1_WATCHDOG_SINGLE_CHANNEL		0
 #define ADC1_WATCHDOG_ALL_CHANNELS			1
 
+/*ADC Modes*/
+#define ADC1_MODE_SINGLE_CHANNEL_SINGLE_CONVERSION				0
+#define ADC1_MODE_SINGLE_CHANNEL_CONTINOUS_CONVERSION			1
+#define ADC1_MODE_MULTI_CHANNEL_SINGLE_CONVERSION				2
+#define ADC1_MODE_MULTI_CHANNEL_CONTINOUS_CONVERSION			3
+#define ADC1_MODE_DUAL_ADC										4
+
 
 
 
@@ -133,10 +140,10 @@ s8 MADC1_s8ReadTemperature(void);
 s8 MADC1_s8ReadInternalRef(void);
 
 /*Enables DMA Request for regular or injected group*/
-void MADC1_voidSetDMARequest(u8 Copy_u8Group,u8 Copy_u8NumberOfChannels);
+void MADC1_voidSetDMARequest(void);
 
 /*Disables DMA Request for regular or injected group*/
-void MADC1_voidClearDMARequest(u8 Copy_u8Group,u8 Copy_u8NumberOfChannels);
+void MADC1_voidClearDMARequest(void);
 
 /*Sets the Limits for the Analog WatchDog*/
 void MADC1_voidSetAnalogWatchdog(u8 Copy_u8GroupType, u8 Copy_u8Mode, u8 Copy_u8ChannelNumber, u16 Copy_u16UpperLimit, u16 Copy_u16LowerLimit);
@@ -151,5 +158,6 @@ void MADC1_voidSetDataAlignment(u8 Copy_u8Alignment);
 
 void MADC1_voidSetInjectedOffset(u8 Copy_u8Channel, u16 Copy_u16OffsetValue);
 
+u32 *MADC1_u32PtrGetRegularDataAddress(void);
 
 #endif

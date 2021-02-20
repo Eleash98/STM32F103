@@ -87,8 +87,8 @@ void MDMA_voidEnableChannel(u8 Copy_u8ChannelID,u32* Copy_Pu32PeripheralAddress,
 	if(Copy_u8ChannelID < 1 || Copy_u8ChannelID > 7)
 		return;
 	DMA->Channel[Copy_u8ChannelID-1].CNDTR = Copy_u16BlockLength;
-	DMA->Channel[Copy_u8ChannelID-1].CPAR = Copy_Pu32PeripheralAddress;
-	DMA->Channel[Copy_u8ChannelID-1].CMAR = Copy_Pu32MemoryAddress;
+	DMA->Channel[Copy_u8ChannelID-1].CPAR = (u32)Copy_Pu32PeripheralAddress;
+	DMA->Channel[Copy_u8ChannelID-1].CMAR = (u32)Copy_Pu32MemoryAddress;
 	
 	SET_BIT(DMA->Channel[Copy_u8ChannelID-1].CCR,0);
 }
@@ -130,196 +130,153 @@ void MDMA_voidAttachCallBack(u8 Copy_u8ChannelID, u8 Copy_u8InterruptType, void 
 void DMA1_Channel1_IRQHandler(void)
 {
 	if (GET_BIT(DMA->Channel[0].CCR,14))
-			SET_BIT(DMA->IFCR,2);
-	volatile u8 Local_u8InterruptType = ((DMA->ISR) & 0xE)>>1;
-	switch(Local_u8InterruptType)
+		SET_BIT(DMA->IFCR,2);
+
+	if(GET_BIT(DMA->ISR,3) == 1 && DMA_voidHandlers[2] != 0)
 	{
-		case 1:
-			if(DMA_voidHandlers[0] != 0)
-				DMA_voidHandlers[0]();
-			DMA->IFCR = 0x3;
-			break;
-		case 2:
-			if(DMA_voidHandlers[1] !=0)
-				DMA_voidHandlers[1]();
-			DMA->IFCR = 0x5;
-			break;
-		case 4:
-			if(DMA_voidHandlers[2] != 0)
-				DMA_voidHandlers[2]();
-			DMA->IFCR = 0x9;
-			break;
-		default:
-			DMA->IFCR = 0xF;
-		break;
+		DMA_voidHandlers[2]();
 	}
+	if(GET_BIT(DMA->ISR,2) == 1 && DMA_voidHandlers[1] != 0)
+	{
+		DMA_voidHandlers[1]();
+	}
+	if(GET_BIT(DMA->ISR,1) == 1 && DMA_voidHandlers[0] != 0)
+	{
+		DMA_voidHandlers[0]();
+	}
+	DMA->IFCR = 1;
 }
 
 void DMA1_Channel2_IRQHandler(void)
 {
 	if (GET_BIT(DMA->Channel[1].CCR,14))
 		SET_BIT(DMA->IFCR,6);
-	volatile u8 Local_u8InterruptType = ((DMA->ISR) & 0xE0)>>5;
-	switch(Local_u8InterruptType)
+	if(GET_BIT(DMA->ISR,7) == 1 && DMA_voidHandlers[5] != 0)
 	{
-		case 1:
-			if(DMA_voidHandlers[3] != 0)
-				DMA_voidHandlers[3]();
-			DMA->IFCR = 0x30;
-			break;
-		case 2:
-			if(DMA_voidHandlers[4] != 0)
-				DMA_voidHandlers[4]();
-			DMA->IFCR = 0x50;
-			break;
-		case 4:
-			if(DMA_voidHandlers[5] != 0)
-				DMA_voidHandlers[5]();
-			DMA->IFCR = 0x90;
-			break;
-		default:
-			DMA->IFCR = 0xF0;
-		break;
+		//Transfer Error Handler
+		DMA_voidHandlers[5]();
 	}
+	if(GET_BIT(DMA->ISR,6) == 1 && DMA_voidHandlers[4] != 0)
+	{
+		//Half Transfer Complete Handler
+		DMA_voidHandlers[4]();
+	}
+	if(GET_BIT(DMA->ISR,5) == 1 && DMA_voidHandlers[3] != 0)
+	{
+		//Transfer Complete Handler
+		DMA_voidHandlers[3]();
+	}
+	DMA->IFCR = 0x10;
 }
 
 void DMA1_Channel3_IRQHandler(void)
 {
 	if (GET_BIT(DMA->Channel[2].CCR,14))
 		SET_BIT(DMA->IFCR,10);
-	volatile u8 Local_u8InterruptType = ((DMA->ISR) & 0xE00)>>9;
-	switch(Local_u8InterruptType)
+	if(GET_BIT(DMA->ISR,11) == 1 && DMA_voidHandlers[8] != 0)
 	{
-		case 1:
-			if(DMA_voidHandlers[6] != 0)
-				DMA_voidHandlers[6]();
-			DMA->IFCR = 0x300;
-			break;
-		case 2:
-			if(DMA_voidHandlers[7] != 0)
-				DMA_voidHandlers[7]();
-			DMA->IFCR = 0x500;
-			break;
-		case 4:
-			if(DMA_voidHandlers[8] != 0)
-				DMA_voidHandlers[8]();
-			DMA->IFCR = 0x900;
-			break;
-		default:
-			DMA->IFCR = 0xF00;
-		break;
+		//Transfer Error Handler
+		DMA_voidHandlers[8]();
 	}
+	if(GET_BIT(DMA->ISR,10) == 1 && DMA_voidHandlers[7] != 0)
+	{
+		//Half Transfer Complete Handler
+		DMA_voidHandlers[7]();
+	}
+	if(GET_BIT(DMA->ISR,9) == 1 && DMA_voidHandlers[6] != 0)
+	{
+		//Transfer Complete Handler
+		DMA_voidHandlers[6]();
+	}
+	DMA->IFCR = 0x100;
 }
 
 void DMA1_Channel4_IRQHandler(void)
 {
 	if (GET_BIT(DMA->Channel[3].CCR,14))
 		SET_BIT(DMA->IFCR,14);
-	volatile u8 Local_u8InterruptType = ((DMA->ISR) & 0xE000)>>13;
-	switch(Local_u8InterruptType)
+	if(GET_BIT(DMA->ISR,15) == 1 && DMA_voidHandlers[11] != 0)
 	{
-		case 1:
-			if(DMA_voidHandlers[9] != 0)
-				DMA_voidHandlers[9]();
-			DMA->IFCR = 0x3000;
-			break;
-		case 2:
-			if(DMA_voidHandlers[10] != 0)
-				DMA_voidHandlers[10]();
-			DMA->IFCR = 0x5000;
-			break;
-		case 4:
-			if(DMA_voidHandlers[11] != 0)
-				DMA_voidHandlers[11]();
-			DMA->IFCR = 0x9000;
-			break;
-		default:
-			DMA->IFCR = 0xF000;
-		break;
+		//Transfer Error Handler
+		DMA_voidHandlers[11]();
 	}
+	if(GET_BIT(DMA->ISR,14) == 1 && DMA_voidHandlers[10] != 0)
+	{
+		//Half Transfer Complete Handler
+		DMA_voidHandlers[10]();
+	}
+	if(GET_BIT(DMA->ISR,13) == 1 && DMA_voidHandlers[9] != 0)
+	{
+		//Transfer Complete Handler
+		DMA_voidHandlers[9]();
+	}
+	DMA->IFCR = 0x1000;
 }
 
 void DMA1_Channel5_IRQHandler(void)
 {
 	if (GET_BIT(DMA->Channel[4].CCR,14))
 		SET_BIT(DMA->IFCR,18);
-	volatile u8 Local_u8InterruptType = ((DMA->ISR) & 0xE0000)>>17;
-	switch(Local_u8InterruptType)
+
+	if(GET_BIT(DMA->ISR,19) == 1 && DMA_voidHandlers[14] != 0)
 	{
-		case 1:
-			if(DMA_voidHandlers[12] != 0)
-				DMA_voidHandlers[12]();
-			DMA->IFCR = 0x30000;
-			break;
-		case 2:
-			if(DMA_voidHandlers[13] != 0)
-				DMA_voidHandlers[13]();
-			DMA->IFCR = 0x50000;
-			break;
-		case 4:
-			if(DMA_voidHandlers[14] != 0)
-				DMA_voidHandlers[14]();
-			DMA->IFCR = 0x90000;
-			break;
-		default:
-			DMA->IFCR = 0xF0000;
-		break;
+		//Transfer Error Handler
+		DMA_voidHandlers[14]();
 	}
+	if(GET_BIT(DMA->ISR,18) == 1 && DMA_voidHandlers[13] != 0)
+	{
+		//Half Transfer Complete Handler
+		DMA_voidHandlers[13]();
+	}
+	if(GET_BIT(DMA->ISR,17) == 1 && DMA_voidHandlers[12] != 0)
+	{
+		//Transfer Complete Handler
+		DMA_voidHandlers[12]();
+	}
+	DMA->IFCR = 0x10000;
 }
 
 void DMA1_Channel6_IRQHandler(void)
 {
 	if (GET_BIT(DMA->Channel[5].CCR,14))
 		SET_BIT(DMA->IFCR,22);
-	volatile u8 Local_u8InterruptType = ((DMA->ISR) & 0xE00000)>>21;
-	switch(Local_u8InterruptType)
+	if(GET_BIT(DMA->ISR,23) == 1 && DMA_voidHandlers[17] != 0)
 	{
-		case 1:
-			if(DMA_voidHandlers[15] != 0)
-				DMA_voidHandlers[15]();
-			DMA->IFCR = 0x300000;
-			break;
-		case 2:
-			if(DMA_voidHandlers[16] != 0)
-				DMA_voidHandlers[16]();
-			DMA->IFCR = 0x500000;
-			break;
-		case 4:
-			if(DMA_voidHandlers[17] != 0)
-				DMA_voidHandlers[17]();
-			DMA->IFCR = 0x900000;
-			break;
-		default:
-			DMA->IFCR = 0xF00000;
-		break;
+		//Transfer Error Handler
+		DMA_voidHandlers[17]();
 	}
+	if(GET_BIT(DMA->ISR,22) == 1 && DMA_voidHandlers[16] != 0)
+	{
+		//Half Transfer Complete Handler
+		DMA_voidHandlers[16]();
+	}
+	if(GET_BIT(DMA->ISR,21) == 1 && DMA_voidHandlers[15] != 0)
+	{
+		//Transfer Complete Handler
+		DMA_voidHandlers[15]();
+	}
+	DMA->IFCR = 0x100000;
 }
 
 void DMA1_Channel7_IRQHandler(void)
 {
 	if (GET_BIT(DMA->Channel[6].CCR,14))
 		CLR_BIT(DMA->IFCR,26);
-	volatile u8 Local_u8InterruptType = ((DMA->ISR) & 0xE000000)>>25;
-	switch(Local_u8InterruptType)
+	if(GET_BIT(DMA->ISR,27) == 1 && DMA_voidHandlers[20] != 0)
 	{
-		case 1:
-			if(DMA_voidHandlers[18] != 0)
-				DMA_voidHandlers[18]();
-			DMA->IFCR = 0x3000000;
-			break;
-		case 2:
-			if(DMA_voidHandlers[19] != 0)
-				DMA_voidHandlers[19]();
-			DMA->IFCR = 0x5000000;
-			break;
-		case 4:
-			if(DMA_voidHandlers[20] != 0)
-				DMA_voidHandlers[20]();
-			DMA->IFCR = 0x9000000;
-			break;
-		default:
-			DMA->IFCR = 0xF0000000;
-		break;
+		//Transfer Error Handler
+		DMA_voidHandlers[20]();
 	}
+	if(GET_BIT(DMA->ISR,26) == 1 && DMA_voidHandlers[19] != 0)
+	{
+		//Half Transfer Complete Handler
+		DMA_voidHandlers[19]();
+	}
+	if(GET_BIT(DMA->ISR,25) == 1 && DMA_voidHandlers[18] != 0)
+	{
+		//Transfer Complete Handler
+		DMA_voidHandlers[18]();
+	}
+	DMA->IFCR = 0x100000;
 }
 

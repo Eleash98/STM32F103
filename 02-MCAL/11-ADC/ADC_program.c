@@ -204,7 +204,7 @@ void MADC1_voidConfigureRegularGroup(u8 Copy_u8NumberOfChannels, u8 *Copy_u8PtrC
 	}
 }
 
-/*Sets the channels to be converted and theire priority in Injected group*/
+/*Sets the channels to be converted and their priority in Injected group*/
 void MADC1_voidConfigureInjectedGroup(u8 Copy_u8NumberOfChannels, u8 *Copy_u8PtrChannels, u8 *Copy_u8PtrChannelOrder)
 {
 	if(Copy_u8NumberOfChannels > 4)
@@ -262,8 +262,6 @@ void MADC1_voidSetExternalTrigger(u8 Copy_u8GroupType, u8 Copy_u8Trigger)
 }
 
 
-
-
 /*Enables Specific interrupt*/
 void MADC1_voidEnableInterrupt(u8 Copy_u8Interrupt)
 {
@@ -309,12 +307,12 @@ void MADC1_voidSetConversionTime(u8 Copy_u8Channel, u8 Copy_u8ConversionTime)
 {
 	if (Copy_u8Channel >= 1 && Copy_u8Channel <= 10)
 	{
-		ADC1->SMPR2 &= ~(7 << ((Copy_u8Channel-1) *3));
+		ADC1->SMPR2 &= ~(7 << ((Copy_u8Channel) *3));
 		ADC1->SMPR2 |= (Copy_u8ConversionTime & 0x7) << ((Copy_u8Channel-1) *3);
 	}
 	else if (Copy_u8Channel >= 11 && Copy_u8Channel <= 18)
 	{
-		ADC1->SMPR1 &= ~(7 << ((Copy_u8Channel-11) *3));
+		ADC1->SMPR1 &= ~(7 << ((Copy_u8Channel-10) *3));
 		ADC1->SMPR1 |= (Copy_u8ConversionTime & 0x7) << ((Copy_u8Channel-11) *3);
 	}
 }
@@ -326,13 +324,13 @@ s8 MADC1_s8ReadTemperature(void);
 s8 MADC1_s8ReadInternalRef(void);
 
 /*Enables DMA Request for regular or injected group*/
-void MADC1_voidSetDMARequest(u8 Copy_u8Group,u8 Copy_u8NumberOfChannels)
+void MADC1_voidSetDMARequest(void)
 {
 	SET_BIT(ADC1->CR2,8);
 }
 
 /*Disables DMA Request for regular or injected group*/
-void MADC1_voidClearDMARequest(u8 Copy_u8Group,u8 Copy_u8NumberOfChannels)
+void MADC1_voidClearDMARequest(void)
 {
 	CLR_BIT(ADC1->CR2,8);
 }
@@ -403,7 +401,10 @@ void MADC1_voidSetInjectedOffset(u8 Copy_u8Channel, u16 Copy_u16OffsetValue)
 	ADC1->JOFR[Copy_u8Channel-1] = Copy_u16OffsetValue & 0xFFF;
 }
 
-
+u32 *MADC1_u32PtrGetRegularDataAddress(void)
+{
+	return &(ADC1->DR);
+}
 
 /* ISR interrupt function for channel 1 */
 void ADC1_2_IRQHandler(void)

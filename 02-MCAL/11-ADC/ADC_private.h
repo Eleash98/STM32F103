@@ -24,12 +24,6 @@ typedef struct{
 
 #define ADC1	((volatile ADC_t*)(0x40012400))
 
-#define ADC1_MODE_SINGLE_CHANNEL_SINGLE_CONVERSION				0
-#define ADC1_MODE_SINGLE_CHANNEL_CONTINOUS_CONVERSION			1
-#define ADC1_MODE_MULTI_CHANNEL_SINGLE_CONVERSION				2
-#define ADC1_MODE_MULTI_CHANNEL_CONTINOUS_CONVERSION			3
-#define ADC1_MODE_DUAL_ADC										4
-
 
 
 void (*RegularEndOfCoversionHandler)	(u16 Copy_u16Value) = 0;
