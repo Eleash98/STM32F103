@@ -173,10 +173,10 @@ void MADC1_voidConfigureRegularGroup(u8 Copy_u8NumberOfChannels, u8 *Copy_u8PtrC
 		return;
 	/*Insert the Number of channels*/
 	ADC1->SQR[0] &= ~(0xF<<20);
-	ADC1->SQR[0] |= (Copy_u8NumberOfChannels<<20);
+	ADC1->SQR[0] |= ((Copy_u8NumberOfChannels-1)<<20);
 	
 	/*Insert the Channels Sequence*/
-	while(Copy_u8NumberOfChannels != 255)
+	while(Copy_u8NumberOfChannels != 0)
 	{
 		if(*Copy_u8PtrChannelOrder >= 1 && *Copy_u8PtrChannelOrder <= 6)
 		{
@@ -235,7 +235,8 @@ void MADC1_voidConfigureInjectedGroup(u8 Copy_u8NumberOfChannels, u8 *Copy_u8Ptr
 /*Starts converting the Regular Group*/
 void MADC1_voidStartRegularGroup(void)
 {
-	SET_BIT(ADC1->CR2,22);
+
+	SET_BIT(ADC1->CR2,0);
 }
 
 /*Starts converting the Injected Group*/
