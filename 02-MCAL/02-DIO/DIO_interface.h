@@ -19,22 +19,22 @@
 #define	PORTB	3
 #define PORTC	4
 
-#define PIN0	0
-#define PIN1	1
-#define PIN2	2
-#define PIN3	3
-#define PIN4	4
-#define PIN5	5
-#define PIN6	6
-#define PIN7	7
-#define PIN8	8
-#define PIN9	9
-#define PIN10	10
-#define PIN11	11
-#define PIN12	12
-#define PIN13	13
-#define PIN14	14
-#define PIN15	15
+#define DIO_PIN0	0
+#define DIO_PIN1	1
+#define DIO_PIN2	2
+#define DIO_PIN3	3
+#define DIO_PIN4	4
+#define DIO_PIN5	5
+#define DIO_PIN6	6
+#define DIO_PIN7	7
+#define DIO_PIN8	8
+#define DIO_PIN9	9
+#define DIO_PIN10	10
+#define DIO_PIN11	11
+#define DIO_PIN12	12
+#define DIO_PIN13	13
+#define DIO_PIN14	14
+#define DIO_PIN15	15
 
 
 #define DIO_OUTPUT_SPEED_10MHZ_PP	0x1		//10Mhz push pull
@@ -63,21 +63,23 @@
 #define DIO_HIGH		1
 #define DIO_LOW			0
 
-void DIO_voidSetPinDirection(u8 Copy_u8Port, u8 Copy_u8Pin, u8 Copy_u8Mode);
+void DIO_voidSetPinDirection(u8 Copy_u8Pin,u8 Copy_u8Port,  u8 Copy_u8Mode);
 
-void DIO_voidSetPin(u8 Copy_u8Port, u8 Copy_u8Pin);
+void DIO_voidSetPinValue(u8 Copy_u8Pin, u8 Copy_u8Port, u8 Copy_u8Value);
 
-void DIO_voidClearPin(u8 Copy_u8Port, u8 Copy_u8Pin);
+void DIO_voidSetPin(u8 Copy_u8Pin, u8 Copy_u8Port);
 
-u8 DIO_u8GetPinValue(u8 Copy_u8Port, u8 Copy_u8Pin);
+void DIO_voidClearPin(u8 Copy_u8Pin, u8 Copy_u8Port);
+
+u8 DIO_u8GetPinValue(u8 Copy_u8Pin, u8 Copy_u8Port);
 
 void DIO_voidSetPortDirection(u8 Copy_u8Port, u8 Copy_u8Mode);
 
 void DIO_voidSetPortValue(u8 Copy_u8Port, u8 Copy_u8Value);
 
-void DIO_voidLockPin(u8 Copy_u8Port, u8 Copy_u8Pin);
+void DIO_voidLockPin(u8 Copy_u8Pin, u8 Copy_u8Port);
 
-void DIO_voidSetPullResistor(u8 Copy_u8Port, u8 Copy_u8Pin, u8 Copy_u8Mode);
+void DIO_voidSetPullResistor(u8 Copy_u8Pin, u8 Copy_u8Port, u8 Copy_u8Mode);
 
 #endif
 

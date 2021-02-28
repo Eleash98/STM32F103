@@ -18,7 +18,7 @@
 #include "DIO_config.h"
 
 
-void DIO_voidSetPinDirection(u8 Copy_u8Port, u8 Copy_u8Pin, u8 Copy_u8Mode){
+void DIO_voidSetPinDirection(u8 Copy_u8Pin,u8 Copy_u8Port,  u8 Copy_u8Mode){
 	switch(Copy_u8Port){
 		case PORTA:
 			if (Copy_u8Pin<=7){
@@ -57,7 +57,34 @@ void DIO_voidSetPinDirection(u8 Copy_u8Port, u8 Copy_u8Pin, u8 Copy_u8Mode){
 	}
 }
 
-void DIO_voidSetPin(u8 Copy_u8Port, u8 Copy_u8Pin){
+void DIO_voidSetPinValue(u8 Copy_u8Pin, u8 Copy_u8Port, u8 Copy_u8Value)
+{
+	switch(Copy_u8Port)
+	{
+		case PORTA:
+			if(Copy_u8Value == DIO_HIGH)
+				DIO_PORTA->BSRR	= (1 << Copy_u8Pin);
+			else
+				DIO_PORTA->BRR	= (1 << Copy_u8Pin);
+			break;
+		case PORTB:
+			if(Copy_u8Value == DIO_HIGH)
+				DIO_PORTB->BSRR	= (1 << Copy_u8Pin);
+			else
+				DIO_PORTB->BRR	= (1 << Copy_u8Pin);
+			break;
+		case PORTC:
+			if(Copy_u8Value == DIO_HIGH)
+				DIO_PORTC->BSRR	= (1 << Copy_u8Pin);
+			else
+				DIO_PORTC->BRR	= (1 << Copy_u8Pin);
+			break;
+		default:
+			break;
+	}
+}
+
+void DIO_voidSetPin(u8 Copy_u8Pin, u8 Copy_u8Port ){
 	switch (Copy_u8Port){
 		case PORTA:
 			DIO_PORTA->BSRR	= (1 << Copy_u8Pin);
@@ -71,7 +98,7 @@ void DIO_voidSetPin(u8 Copy_u8Port, u8 Copy_u8Pin){
 		default: break;
 	}
 }
-void DIO_voidClearPin(u8 Copy_u8Port, u8 Copy_u8Pin){
+void DIO_voidClearPin(u8 Copy_u8Pin,u8 Copy_u8Port){
 	switch (Copy_u8Port){
 		case PORTA:
 			DIO_PORTA->BRR	= (1 << Copy_u8Pin);
@@ -87,7 +114,7 @@ void DIO_voidClearPin(u8 Copy_u8Port, u8 Copy_u8Pin){
 }
 
 
-u8 DIO_u8GetPinValue(u8 Copy_u8Port, u8 Copy_u8Pin){
+u8 DIO_u8GetPinValue(u8 Copy_u8Pin, u8 Copy_u8Port){
 	u8 LOC_u8Result = 0;
 	switch (Copy_u8Port){
 		case PORTA:
@@ -141,7 +168,7 @@ void DIO_voidSetPortValue(u8 Copy_u8Port, u8 Copy_u8Value){
 	}
 }
 
-void DIO_voidLockPin(u8 Copy_u8Port, u8 Copy_u8Pin){
+void DIO_voidLockPin(u8 Copy_u8Pin, u8 Copy_u8Port){
 	volatile u32* Port_LCKR;
 	switch (Copy_u8Port){
 		case PORTA:
@@ -163,7 +190,7 @@ void DIO_voidLockPin(u8 Copy_u8Port, u8 Copy_u8Pin){
 	GET_BIT(*Port_LCKR,16);
 	GET_BIT(*Port_LCKR,16);
 }
-void DIO_voidSetPullResistor(u8 Copy_u8Port, u8 Copy_u8Pin, u8 Copy_u8Mode){
+void DIO_voidSetPullResistor(u8 Copy_u8Pin, u8 Copy_u8Port, u8 Copy_u8Mode){
 	switch (Copy_u8Port){
 		case PORTA:
 			if (Copy_u8Mode == PULL_UP)
