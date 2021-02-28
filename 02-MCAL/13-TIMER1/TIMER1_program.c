@@ -8,31 +8,68 @@
 #include "TIMER1_interface.h"
 #include "TIMER1_private.h"
 
+/***************************Timer Settings**************************/
 
-void MTIM1_voidSetTimeBase(u16 Copy_u16Prescalar, u8 Copy_u8RepetitionCounter)
+void MTIM1_voidConfigureFilterDivision(u8 Copy_u8Division)
 {
+	TIMER1->CR1 &= ~(0x300);
+	TIMER1->CR1 |= ((Copy_u8Division & 3) << 8);
+}
+
+void MTIM1_voidConfigureTopValueChange(u8 Copy_u8Setting)
+{
+	CLR_BIT(TIMER1->CR1,7);
+	TIMER1->CR1 |= ((Copy_u8Setting & 1) << 7);
+}
+
+void MTIM1_voidConfigureCCControlChange(u8 Copy_u8Setting)
+{
+	CLR_BIT(TIMER1->CR2,0);
+	TIMER1->CR2 |= (Copy_u8Setting & 1);
+}
+
+void MTIM1_voidConfigureOnePulseMode(u8 Copy_u8Mode)
+{
+	CLR_BIT(TIMER1->CR1,3);
+	TIMER1->CR1 |= ((Copy_u8Mode & 1) << 3);
+}
+
+void MTIM1_voidConfigureUpdateRequestSource(u8 Copy_u8Source)
+{
+	CLR_BIT(TIMER1->CR1,2);
+	TIMER1->CR1 |= ((Copy_u8Source & 1) << 2);
+}
+
+void MTIM1_voidConfigureCCControlUpdateSource(u8 Copy_u8Source)
+{
+	CLR_BIT(TIMER1->CR2,1);
+	TIMER1->CR2 |= ((Copy_u8Source & 1) <<1);
+}
+
+/***************Setting Time Base and clock source*****************/
+
+void MTIM1_voidSetTimeBase(u8 Copy_u8Allignment, u16 Copy_u16Prescalar, u8 Copy_u8RepetitionCounter)
+{
+	TIMER1->CR1 &= ~(0x60);
+	TIMER1->CR1 |= ((Copy_u8Allignment&3) << 5);
 	TIMER1->PSC = Copy_u16Prescalar;
 	TIMER1->RCR = Copy_u8RepetitionCounter;
 }
 
-void MTIM1_voidSetClockInternal(u8 Copy_u8Direction)
+void MTIM1_voidSetClockInternal(void)
 {
 	// Disable slave mode controller
 	TIMER1->SMCR &= ~7;
-	
-	//configure direction
-	CLR_BIT(TIMER1->CR1,4);
-	
-	TIMER1->CR1	|= ((Copy_u8Direction&1) << 4);
+
 }
 
-void MTIM1_voidSetClockETRPin(u8 Copy_u8Polarity, u8 Copy_u8Prescalar, u8 Copy_u8Filter)
+void MTIM1_voidSetClockETRPin( u8 Copy_u8Polarity, u8 Copy_u8Prescalar, u8 Copy_u8Filter)
 {
 	TIMER1->SMCR &= ~(0xFF00);
 	TIMER1->SMCR |= ((Copy_u8Polarity&1)<<15) | (1<<14) | ((Copy_u8Prescalar&3)<<12) | ((Copy_u8Filter&0xF)<<8);
 }
 
-void MTIM1_voidSetClockExternalTrigger(u8 Copy_u8TimerInputPin, u8 Copy_u8Filter, u8 Copy_u8Edge)
+void MTIM1_voidSetClockExternalTrigger( u8 Copy_u8TimerInputPin, u8 Copy_u8Filter, u8 Copy_u8Edge)
 {
 	if(Copy_u8TimerInputPin == TIMER1_CLOCK_EXTERNAL_T1)
 	{	
@@ -86,15 +123,19 @@ void MTIM1_voidSetClockExternalTrigger(u8 Copy_u8TimerInputPin, u8 Copy_u8Filter
 		
 	}
 }
-void MTIMER1_voidSetClockInternalTrigger(u8 Copy_u8InputTrigger)
+void MTIM1_voidSetClockInternalTrigger( u8 Copy_u8InputTrigger)
 {
 	TIMER1->SMCR &= ~(0x70);
 	TIMER1->SMCR |= ((Copy_u8InputTrigger&7) << 4) | 7;
 }
 
-
+/********************Control the timer throughout external signals*************************/
+/*
+ * Only works with internal clock and External Trigger pin Mode (ETR)
+ */
 void MTIM1_voidSetSlaveMode(u8 Copy_u8SlaveMode, u8 Copy_u8Event, u8 Copy_u8TimerInputPin, u8 Copy_u8Filter)
 {
+
 	if(Copy_u8TimerInputPin == TIMER1_SLAVE_PIN_TI1)
 	{
 		/*Disable the input capture unit*/
@@ -107,7 +148,7 @@ void MTIM1_voidSetSlaveMode(u8 Copy_u8SlaveMode, u8 Copy_u8Event, u8 Copy_u8Time
 		TIMER1->CCMR1 |= (1 | ((Copy_u8Filter&0xF)<<4));
 		
 		/*Select the Edge*/
-		TIMER1->CCER |= ((Copy_u8Edge&1)<<1);
+		TIMER1->CCER |= ((Copy_u8Event&1)<<1);
 		
 		/*Clear the Slave mode selection*/
 		TIMER1->SMCR &= ~((7<<4));
@@ -127,7 +168,7 @@ void MTIM1_voidSetSlaveMode(u8 Copy_u8SlaveMode, u8 Copy_u8Event, u8 Copy_u8Time
 		TIMER1->CCMR1 |= (0x100 | ((Copy_u8Filter&0xF)<<12));
 		
 		/*Select the Edge*/
-		TIMER1->CCER |= ((Copy_u8Edge&1)<<5);
+		TIMER1->CCER |= ((Copy_u8Event&1)<<5);
 		
 		/*Clear the Slave mode selection*/
 		TIMER1->SMCR &= ~((7<<4));
@@ -135,19 +176,128 @@ void MTIM1_voidSetSlaveMode(u8 Copy_u8SlaveMode, u8 Copy_u8Event, u8 Copy_u8Time
 		/*Set Slave mode Selection and trigger selection*/
 		TIMER1->SMCR |= (6<<4) | (Copy_u8SlaveMode);
 	}
+
+	if(Copy_u8SlaveMode == TIMER1_SLAVE_COUNT_ON_EVENT)
+		TOG_BIT(TIMER1->CCER,5);
 }
 
 
-void MTIM1_voidEnableTimer(u16 Copy_u16Preload, u16 Copy_u16TopValue)
+/***********************Controlling  the Timer with Software****************************/
+void MTIM1_voidEnableTimer(u8 Copy_u8Direction, u16 Copy_u16Preload, u16 Copy_u16TopValue)
 {
+
+	CLR_BIT(TIMER1->CR1,4);
+	TIMER1->CR1 |= Copy_u8Direction<<4;
+
 	TIMER1->CNT = Copy_u16Preload;
 	
 	TIMER1->ARR = Copy_u16TopValue;
 	
 	SET_BIT(TIMER1->CR1, 0);
 }
+void MTIM1_voidStartTimer(void)
+{
+	SET_BIT(TIMER1->CR1, 0);
+}
+void MTIM1_voidStopTimer(void)
+{
+	CLR_BIT(TIMER1->CR1, 0);
+}
+void MTIM1_voidSetCounter(u16 Copy_u16CounterValue)
+{
+	TIMER1->CNT = Copy_u16CounterValue;
+}
+void MTIM1_voidSetTopValue(u16 Copy_u16TopValue)
+{
+	TIMER1->ARR = Copy_u16TopValue;
+}
+
+void MTIM1_voidEnableUpdateEvent(void)
+{
+	CLR_BIT(TIMER1->CR1,1);
+}
+
+void MTIM1_voidDisableUpdateEvent(void)
+{
+	SET_BIT(TIMER1->CR1,1);
+}
+
+void MTIM1_voidGenerateEvent(u8 Copy_u8Event)
+{
+	TIMER1->EGR = Copy_u8Event;
+}
+
+void MTIM1_voidEnableInterrupt(u8 Copy_u8Interrupt)
+{
+	if(Copy_u8Interrupt > 7)
+		return;
+	SET_BIT(TIMER1->DIER,Copy_u8Interrupt);
+}
+void MTIM1_voidDisableInterrupt(u8 Copy_u8Interrupt)
+{
+	if(Copy_u8Interrupt > 7)
+		return;
+	CLR_BIT(TIMER1->DIER,Copy_u8Interrupt);
+}
+
+/***********************Controlling Other Timers from Timer1************************/
+void MTIM1_voidSetMasterTrigOut(u8 Copy_u8TriggerSource, u8 Copy_u8SynchEnable)
+{
+	TIMER1->CR2	&= ~(0x70);
+	TIMER1->CR2 |= ((Copy_u8TriggerSource & 7) << 4);
+
+	CLR_BIT(TIMER1->SMCR,7);
+	TIMER1->SMCR |= ((Copy_u8SynchEnable & 1) << 7);
+}
 
 
+
+
+
+
+
+
+
+
+
+
+u16 MTIM1_u16GetCounter(void)
+{
+	return TIMER1->CNT;
+}
+
+
+
+
+/***************************Timer Output Channels Control********************/
+void MTIM1_voidConfigureOutputIdle(u8 Copy_u8ChannelID, u8 Copy_u8IdleState)
+{
+	if(Copy_u8ChannelID > 6)
+		return;
+	CLR_BIT(TIMER1->CR2,(Copy_u8ChannelID+8));
+	TIMER1->CR2 |= ((Copy_u8IdleState & 1) << (Copy_u8ChannelID+8));
+}
+
+
+/********************DMA With Timer1******************************/
+void MTIM1_voidConfigureDMARequestSource(u8 Copy_u8Source)
+{
+	CLR_BIT(TIMER1->CR2,3);
+	TIMER1->CR2 |= ((Copy_u8Source & 1) << 3);
+}
+
+void MTIM1_voidEnableDMARequest(u8 Copy_u8DMARequest)
+{
+	if(Copy_u8DMARequest > 13 || Copy_u8DMARequest < 8)
+		return;
+	SET_BIT(TIMER1->DIER,Copy_u8DMARequest);
+}
+void MTIM1_voidDisableDMARequest(u8 Copy_u8DMARequest)
+{
+	if(Copy_u8DMARequest > 13 || Copy_u8DMARequest < 8)
+		return;
+	CLR_BIT(TIMER1->DIER,Copy_u8DMARequest);
+}
 
 
 
